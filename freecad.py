@@ -1,80 +1,57 @@
-import FreeCAD as App
-import Part
+import FreeCAD, Part, Draft
+import math
 
-def create_cone(r_top, r_bottom, height):
-    """
-    创建一个锥形主体。
+def create_table_top(diameter=4, thickness=0.2):
+    # 创建桌面
+    table_top = Part.makeCylinder(diameter/2, thickness)
+    table_top.Placement.Base.z = -thickness/2  # 调整位置使底面与原点对齐
+    return table_top
 
-    参数:
-    r_top (float): 顶部开口半径
-    r_bottom (float): 底部开口半径
-    height (float): 锥形的高度
+def create_table_leg(diameter=0.3, height=1.5):
+    # 创建单个桌腿
+    leg = Part.makeCylinder(diameter/2, height)
+    leg.Placement.Base.z = -height  # 调整位置使底部接触地面
+    return leg
 
-    返回:
-    Part::Feature: 锥形主体
-    """
-    # 创建两个圆
-    top_circle = Part.makeCircle(r_top, App.Vector(0, 0, 0))
-    bottom_circle = Part.makeCircle(r_bottom, App.Vector(0, 0, -height))
+def arrange_legs(leg, num_legs=4, radius=2-0.3/2):
+    # 安排桌腿的位置
+    legs = []
+    for i in range(num_legs):
+        angle = i * (360 / num_legs)
+        new_leg = leg.copy()
+        new_leg.Placement.Base.x = radius * math.cos(angle * math.pi / 180)
+        new_leg.Placement.Base.y = radius * math.sin(angle * math.pi / 180)
+        legs.append(new_leg)
+    return legs
 
-    # 创建线段连接两个圆的中心点
-    line = Part.makeLine(App.Vector(0, 0, 0), App.Vector(0, 0, -height))
+def assemble_table(table_top, legs):
+    # 组装桌子
+    table_parts = [table_top] + legs
+    table = Part.makeCompound(table_parts)
+    return table
 
-    # 创建锥形主体
-    cone = Part.makeLoft([top_circle, bottom_circle], True)
-    return cone
+# 主函数
+def main():
+    # 创建桌面和桌腿
+    top = create_table_top()
+    leg = create_table_leg()
+    arranged_legs = arrange_legs(leg)
 
-def create_outlet(diameter, height, position):
-    """
-    创建一个小圆柱体作为出口。
+    # 组装桌子
+    final_table = assemble_table(top, arranged_legs)
 
-    参数:
-    diameter (float): 出口直径
-    height (float): 出口高度
-    position (App.Vector): 出口的位置
+    # 将最终模型添加到FreeCAD文档中
+    doc = FreeCAD.ActiveDocument
+    if doc is None:
+        doc = FreeCAD.newDocument("Table")
+    obj = doc.addObject("Part::Feature", "Table")
+    obj.Shape = final_table
+    doc.recompute()
 
-    返回:
-    Part::Feature: 出口部分
-    """
-    radius = diameter / 2
-    outlet = Part.makeCylinder(radius, height, position)
-    return outlet
+    # 保存
+    # 保存文档
+    file_path = "output/table_model.FCStd"  # 指定保存路径和文件名
+    doc.saveAs(file_path)
+    print(f"模型已保存为 {file_path}")
 
-def create_funnel(r_top, r_bottom, height, d_outlet, h_outlet):
-    """
-    创建一个完整的漏斗模型。
-
-    参数:
-    r_top (float): 漏斗顶部开口半径
-    r_bottom (float): 漏斗底部开口半径
-    height (float): 漏斗高度
-    d_outlet (float): 出口直径
-    h_outlet (float): 出口高度
-
-    返回:
-    Part::Compound: 完整的漏斗模型
-    """
-    # # 创建锥形主体
-    # cone = create_cone(r_top, r_bottom, height)
-
-    # 创建出口部分
-    outlet_position = App.Vector(0, 0, -height + h_outlet/2)
-    outlet = create_outlet(d_outlet, h_outlet, outlet_position)
-
-    # 将锥形主体和出口部分组合在一起
-    # funnel = Part.makeCompound([cone, outlet])
-
-    return outlet
-
-# 设置参数
-r_top = 50  # 顶部开口半径
-r_bottom = 20  # 底部开口半径
-height = 100  # 漏斗高度
-d_outlet = 10  # 出口直径
-h_outlet = 20  # 出口高度
-
-# 创建漏斗
-funnel = create_funnel(r_top, r_bottom, height, d_outlet, h_outlet)
-
-# 显示漏斗
-Part.show(funnel)
+main()
