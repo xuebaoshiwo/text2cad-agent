@@ -13,7 +13,7 @@ if __name__ == "__main__":
     async def main():
         qa_chain = QAChainService()
         question = """
-    画一张圆桌
+    画一个小轿车
 """
         # answer = await qa_chain.get_answer(question, npl2json_prompt)
         # answer = await qa_chain.get_answer(json2py_prompt, ["json_description"], json_description=question)

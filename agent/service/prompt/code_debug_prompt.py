@@ -1,5 +1,5 @@
 code_debug_prompt = """
-请你作为一名经验丰富的FreeCad Python 开发者，对下面的FreeCad Python 代码进行检查并修复可能存在的错误，包括但不限于语法错误、逻辑错误和运行时错误，经过你的检查和debug后，代码不但会实现原有功能，还可以在外部使用FreeCad的python解释器直接运行。
+请你作为一名经验丰富的FreeCad Python 开发者，下面的FreeCAD Python 代码存在运行报错，你需要修改其中的错误，包括但不限于语法错误、逻辑错误和运行时错误，经过你的debug后，代码不但会实现原有功能，还可以在外部使用FreeCad的python解释器直接运行。
 
 你需要：
 1. 明确该代码的目标或功能；
@@ -10,4 +10,7 @@ code_debug_prompt = """
 
 以下是需要检查的原始代码：
 {code_string}
+
+报错信息：
+{error_info}
 """

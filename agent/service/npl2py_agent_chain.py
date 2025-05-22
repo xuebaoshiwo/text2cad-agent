@@ -15,7 +15,7 @@ import uuid
 import os
 
 class NPL2PYAgentChain:
-    def __init__(self, output_ab_dir = r"D:/Text2Cad/text2cad-agent/output", max_retry_times = 3):
+    def __init__(self, output_ab_dir = r"D:/Text2Cad/text2cad-agent/output", freecad_python_path = r"D:/freecad/bin/python.exe", max_retry_times = 3):
          self.qa_chain = QAChainService()
 
          # 分析层
@@ -25,10 +25,10 @@ class NPL2PYAgentChain:
          self.generate_py_prompt = generate_py_prompt
          self.generate_py_prompt_key = ["npl_description", "output_ab_dir"]
          # 执行层
-         self.runner = FreeCADPythonRunner()
+         self.runner = FreeCADPythonRunner(freecad_python_path)
          # debug层
          self.code_debug_prompt = code_debug_prompt
-         self.code_debug_prompt_key = ["code_string"]
+         self.code_debug_prompt_key = ["code_string", "error_info"]
          # 保存路径
          self.output_ab_dir = output_ab_dir
          self.max_retry_times = max_retry_times
@@ -56,24 +56,32 @@ class NPL2PYAgentChain:
         while(flag and retry_times < self.max_retry_times):
             try:
                   res = self.runner.run_code_string(code_str)
-                  flag = False
+                  if res['returncode'] == 0:
+                     flag = False
+                  else:
+                     raise Exception(res['stderr'])
             except Exception as e:
                print(f"执行失败，开始debug，当前重试次数：{retry_times}")
                code_str = await self.qa_chain.get_answer(
                   self.code_debug_prompt, 
                   self.code_debug_prompt_key, 
-                  code_string=code_str
+                  code_string=code_str,
+                  error_info=e
                )
-               res = self.runner.run_code_string(code_str)
-               flag = False
+               print("debug（处理前）中: ", code_str)
+               code_str = parse_llm_py_code(code_str)
+               print("debug中: ", code_str)
             retry_times += 1
 
         return demand_analysis_result, generate_py_result, res
 
 if __name__ == "__main__":
-    npl2py_agent_chain = NPL2PYAgentChain()
+    npl2py_agent_chain = NPL2PYAgentChain(
+        output_ab_dir=r"E:\Text2Cad\output",
+        freecad_python_path=r"E:\FreeCad\bin\python.exe"
+    )
     npl = """
-   画一个灯塔    
+   画一个插头
 """
     demand_analysis_result, generate_py_result, res = asyncio.run(npl2py_agent_chain.run(npl))
     print(demand_analysis_result)

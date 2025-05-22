@@ -1,15 +1,20 @@
-import asyncio
-from service.qa_chain import QAChainService
+import sys
+sys.path.append(r"E:/Text2Cad/agent")
 
-async def test_qa():
-    qa_service = QAChainService()
-    question = "请介绍一下你自己，你是谁？"
-    try:
-        answer = await qa_service.get_answer(question)
-        print(f"问题: {question}")
-        print(f"回答: {answer}")
-    except Exception as e:
-        print(f"错误: {str(e)}")
+import asyncio
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from service.claude_service import ClaudeLLM  # 你需要先实现这个类
 
 if __name__ == "__main__":
-    asyncio.run(test_qa()) 
+    async def main():
+        llm = ClaudeLLM()
+        prompt = PromptTemplate(
+            input_variables=["question"],
+            template="请用专业、简洁的语言回答：{question}"
+        )
+        chain = LLMChain(llm=llm, prompt=prompt)
+        question = "介绍一下你自己"
+        answer = await chain.arun(question=question)
+        print(answer)
+    asyncio.run(main())

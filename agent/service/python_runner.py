@@ -59,7 +59,12 @@ class FreeCADPythonRunner:
                 'success': False
             }
         except Exception as e:
-            raise e
+            return {
+                'returncode': -2,
+                'stdout': '',
+                'stderr': f'执行失败: {str(e)}',
+                'success': False
+            }
         
 if __name__ == "__main__":
     runner = FreeCADPythonRunner()
