@@ -3,10 +3,17 @@ from langchain.prompts import PromptTemplate
 import sys
 sys.path.append(r"E:/Text2Cad/agent/service")
 from qwen_service import QwenLLM
+from claude_service import ClaudeLLM
 
 class QAChainService:
-    def __init__(self):
-        self.llm = QwenLLM()
+    def __init__(self, type: str = "qwen"):
+        self.llm = None
+        if type == "qwen":
+            self.llm = QwenLLM()
+        elif type == "claude":
+            self.llm = ClaudeLLM()
+        else:
+            raise Exception("不支持的LLM类型")
         self.prompt = PromptTemplate(
             input_variables=["question"],
             template="""请回答下面的问题。请保持专业、准确和简洁。

@@ -17,6 +17,7 @@ import os
 class NPL2PYAgentChain:
     def __init__(self, output_ab_dir = r"D:/Text2Cad/text2cad-agent/output", freecad_python_path = r"D:/freecad/bin/python.exe", max_retry_times = 3):
          self.qa_chain = QAChainService()
+         self.code_debug_chain = QAChainService(type="claude")
 
          # 分析层
          self.demand_analysis_prompt = demand_analysis_prompt
@@ -35,20 +36,22 @@ class NPL2PYAgentChain:
 
     async def run(self, npl: str):
         # 分析层
-        demand_analysis_result = await self.qa_chain.get_answer(
+        demand_analysis_result = await self.code_debug_chain.get_answer(
             self.demand_analysis_prompt, 
             self.demand_analysis_prompt_key, 
             npl_description=npl
             )
+        print("分析层: ", demand_analysis_result)
         # 生成代码层
         uuid_str = str(uuid.uuid4()) + r".FCStd"
         output_ab_path = os.path.join(self.output_ab_dir, uuid_str)
-        generate_py_result = await self.qa_chain.get_answer(
+        generate_py_result = await self.code_debug_chain.get_answer(
             self.generate_py_prompt, 
             self.generate_py_prompt_key, 
             npl_description=demand_analysis_result, 
             output_ab_dir=output_ab_path
             )
+        print("生成代码层: ", generate_py_result)
         code_str = parse_llm_py_code(generate_py_result)
         # 执行层
         flag = True
@@ -61,27 +64,22 @@ class NPL2PYAgentChain:
                   else:
                      raise Exception(res['stderr'])
             except Exception as e:
-               print(f"执行失败，开始debug，当前重试次数：{retry_times}")
-               code_str = await self.qa_chain.get_answer(
+               print(f"执行失败: {e}，开始debug，当前重试次数：{retry_times}")
+               code_str = await self.code_debug_chain.get_answer(
                   self.code_debug_prompt, 
                   self.code_debug_prompt_key, 
                   code_string=code_str,
                   error_info=e
                )
-               print("debug（处理前）中: ", code_str)
                code_str = parse_llm_py_code(code_str)
-               print("debug中: ", code_str)
             retry_times += 1
 
         return demand_analysis_result, generate_py_result, res
 
 if __name__ == "__main__":
-    npl2py_agent_chain = NPL2PYAgentChain(
-        output_ab_dir=r"E:\Text2Cad\output",
-        freecad_python_path=r"E:\FreeCad\bin\python.exe"
-    )
+    npl2py_agent_chain = NPL2PYAgentChain()
     npl = """
-   画一个插头
+   画一只高脚杯
 """
     demand_analysis_result, generate_py_result, res = asyncio.run(npl2py_agent_chain.run(npl))
     print(demand_analysis_result)

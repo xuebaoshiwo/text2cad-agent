@@ -34,3 +34,8 @@ class QwenLLM(LLM):
             return response.output.text
         else:
             raise Exception(f"API调用失败: {response.message}") 
+        
+
+if __name__ == "__main__":
+    llm = QwenLLM()
+    print(llm.invoke("你好"))

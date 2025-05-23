@@ -1,0 +1,15 @@
+{
+    "support_name": "freecad geometry python",
+    "supports": [
+        {
+            "name": "Triangular board",
+            "python": "import FreeCAD as App\nimport Part\n\ndoc = App.newDocument(\"TriangleRuler\")\n\n# 定义三角形的三个点（单位：毫米）\np1 = App.Vector(0, 0, 0)\np2 = App.Vector(100, 0, 0)\np3 = App.Vector(0, 100, 0)\n\n# 创建一个闭合的三角形\ntriangle_wire = Part.makePolygon([p1, p2, p3, p1])\ntriangle_face = Part.Face(triangle_wire)\n\n# 拉伸厚度（例如 3mm）\nthickness = 3\ntriangle_solid = triangle_face.extrude(App.Vector(0, 0, thickness))\n\n# 添加到文档中\npart_obj = doc.addObject(\"Part::Feature\", \"TriangleRuler\")\npart_obj.Shape = triangle_solid\n\ndoc.recompute()"
+        },
+        {
+            "name": "mug handle",
+            "python": "import FreeCAD as App\nimport Part\nfrom FreeCAD import Base\n\ndef create_handle(doc):\n    # 创建C形把手\n    # 简化把手创建方法，使用基本几何体组合\n    handle_radius = 0.35  # 把手管状结构的半径\n    bottom_offset = 1.0   # 把手底部距离杯底的高度\n    handle_height = 4.0   # 把手高度\n    handle_extension = 1.5  # 把手从杯身延伸出的距离\n\n    # 创建把手的底部连接部分 - 水平圆柱体\n    handle_bottom = Part.makeCylinder(\n        handle_radius, \n        handle_extension, \n        Base.Vector(2.0, 0, bottom_offset), \n        Base.Vector(1, 0, 0)\n    )\n\n    # 创建把手的顶部连接部分 - 水平圆柱体\n    handle_top = Part.makeCylinder(\n        handle_radius, \n        handle_extension, \n        Base.Vector(2.0, 0, bottom_offset + handle_height), \n        Base.Vector(1, 0, 0)\n    )\n\n    # 创建把手的垂直部分 - 垂直圆柱体\n    handle_vertical = Part.makeCylinder(\n        handle_radius, \n        handle_height, \n        Base.Vector(2.0 + handle_extension, 0, bottom_offset), \n        Base.Vector(0, 0, 1)\n    )\n\n    # 创建把手底部圆角连接 - 球体\n    handle_bottom_corner = Part.makeSphere(\n        handle_radius, \n        Base.Vector(2.0 + handle_extension, 0, bottom_offset)\n    )\n\n    # 创建把手顶部圆角连接 - 球体\n    handle_top_corner = Part.makeSphere(\n        handle_radius, \n        Base.Vector(2.0 + handle_extension, 0, bottom_offset + handle_height)\n    )\n\n    # 融合把手的各个部分\n    handle_shape = handle_bottom.fuse([\n        handle_top,\n        handle_vertical,\n        handle_bottom_corner,\n        handle_top_corner\n    ])\n\n    # 创建FreeCAD对象\n    handle = doc.addObject(\"Part::Feature\", \"Handle\")\n    handle.Shape = handle_shape\n\n    return handle\n\n# 使用示例\nif __name__ == \"__main__\":\n    doc = App.newDocument(\"HandleDemo\")\n    create_handle(doc)\n    doc.recompute()\n    App.ActiveDocument.recompute()"
+        }
+          
+    ]
+
+}
