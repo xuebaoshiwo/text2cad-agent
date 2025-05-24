@@ -37,8 +37,11 @@ devide_steps_prompt = """
 
 if __name__ == "__main__":
     import sys 
+    import os
     import asyncio
-    sys.path.append("d:\\Text2Cad\\text2cad-agent\\agent\\service")
+    # sys.path.append("d:\\Text2Cad\\text2cad-agent\\agent\\service")
+    sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
     print(sys.path)
     from qa_chain import QAChainService
     qa_chain = QAChainService()

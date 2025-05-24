@@ -1,7 +1,10 @@
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 import sys
+import os
 sys.path.append(r"E:/Text2Cad/agent/service")
+sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
 from qwen_service import QwenLLM
 from claude_service import ClaudeLLM
 
