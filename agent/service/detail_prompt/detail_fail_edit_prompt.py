@@ -15,8 +15,10 @@ detail_fail_edit_prompt = """
 
 if __name__ == "__main__":
     import sys 
+    import os
     import asyncio
-    sys.path.append(r"D:\Text2Cad\text2cad-agent\agent\service")
+    # sys.path.append(r"D:\Text2Cad\text2cad-agent\agent\service")
+    sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
     from qa_chain import QAChainService
     qa_chain = QAChainService(type="claude")
     edit_detail_info = "火箭的三角板平衡翼方向有误，不应该三角面与地面平行，而应该是三角面与地面垂直才对"

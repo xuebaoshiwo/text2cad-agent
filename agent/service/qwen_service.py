@@ -3,7 +3,10 @@ from langchain.callbacks.manager import CallbackManagerForLLMRun
 from typing import Any, List, Optional
 from dashscope import Generation
 import sys
+import os
 sys.path.append(r"E:/Text2Cad/agent/service")
+sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
 from config import QwenSettings
 
 class QwenLLM(LLM):

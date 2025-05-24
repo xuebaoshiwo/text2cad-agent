@@ -1,5 +1,10 @@
 import sys
+
+import os
+sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
 sys.path.append(r"D:\Text2Cad\text2cad-agent\agent\service")
+
 from qa_chain import QAChainService
 from detail_prompt.detail_suggest_promt import detail_suggest_prompt
 from detail_prompt.detail_fail_edit_prompt import detail_fail_edit_prompt

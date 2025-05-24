@@ -1,5 +1,8 @@
 import sys
+import os
 sys.path.append(r"E:/Text2Cad/agent/service")
+sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
 
 import asyncio
 from qa_chain import QAChainService

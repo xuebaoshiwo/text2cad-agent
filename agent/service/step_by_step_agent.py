@@ -1,5 +1,9 @@
 import sys
-sys.path.append(r"D:/Text2Cad/agent/service")
+import os
+
+# sys.path.append(r"D:/Text2Cad/agent/service")
+sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
+
 
 import asyncio
 from qa_chain import QAChainService
@@ -18,10 +22,16 @@ from knowledge_support.get_support import get_geometry_support
 
 import json
 import uuid
-import os
 
 class NPL2PyStepByStepAgentChain:
-    def __init__(self, output_ab_dir = r"D:/Text2Cad/text2cad-agent/output", freecad_python_path = r"D:/freecad/bin/python.exe", max_retry_times = 3):
+    def __init__(self, output_ab_dir=None, freecad_python_path = None, max_retry_times = 3):
+         # 获取text2cad-agent根目录
+         root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+         if output_ab_dir is None:
+             output_ab_dir = os.path.join(root_dir, "output")
+         if freecad_python_path is None:
+             # 默认使用环境变量或配置文件中的FreeCAD Python路径
+             freecad_python_path = os.environ.get("FREECAD_PYTHON_PATH", r"D:/freecad/bin/python.exe")
          self.support_names, self.supports = get_geometry_support()
          self.qa_chain = QAChainService()
          self.code_debug_chain = QAChainService(type="claude")
@@ -44,7 +54,8 @@ class NPL2PyStepByStepAgentChain:
          self.output_ab_dir = output_ab_dir
          self.max_retry_times = max_retry_times
 
-    async def run(self, npl: str, output_ab_dir: str = r"D:/Text2Cad/text2cad-agent/output"):
+    async def run(self, npl: str, output_ab_dir: str = "output"):
+
         
         id = str(uuid.uuid4())
         
@@ -124,6 +135,11 @@ class NPL2PyStepByStepAgentChain:
             print(f"当前代码: {existing_code}")
             print("--------------------------------")
         
+        # # 保存最终代码到 output_ab_dir
+        # output_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
+        # os.makedirs(self.output_ab_dir, exist_ok=True)
+        # with open(output_path, "w", encoding="utf-8") as f:
+        #     f.write(existing_code)
 
         return demand_analysis_result, devide_steps_result, existing_code
 
