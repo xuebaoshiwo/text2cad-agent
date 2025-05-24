@@ -7,8 +7,8 @@ from openai import OpenAI
 
 class ClaudeSettings(BaseSettings):
     ANTHROPIC_API_KEY: str = "sk-8Zt52PZNeySmDUEpFe82C9Df039f4c5092625c03FdBbDb3e"
-    MODEL_NAME: str = "claude-sonnet-4-20250514"  # 可根据需要更换
-    # MODEL_NAME: str = "claude-3-5-sonnet-latest"
+    # MODEL_NAME: str = "claude-sonnet-4-20250514"  # 可根据需要更换
+    MODEL_NAME: str = "claude-sonnet-4-20250514"
     TEMPERATURE: float = 0.7
     MAX_TOKENS: int = 1500
     TOP_P: float = 0.8

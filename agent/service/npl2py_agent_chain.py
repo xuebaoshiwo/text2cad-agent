@@ -78,11 +78,11 @@ class NPL2PYAgentChain:
                code_str = parse_llm_py_code(code_str)
             retry_times += 1
 
-        # 保存最终代码到 output_ab_dir
-        output_code_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
-        os.makedirs(self.output_ab_dir, exist_ok=True)
-        with open(output_code_path, "w", encoding="utf-8") as f:
-            f.write(code_str)
+        # # 保存最终代码到 output_ab_dir
+        # output_code_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
+        # os.makedirs(self.output_ab_dir, exist_ok=True)
+        # with open(output_code_path, "w", encoding="utf-8") as f:
+        #     f.write(code_str)
 
         return demand_analysis_result, generate_py_result, res
 

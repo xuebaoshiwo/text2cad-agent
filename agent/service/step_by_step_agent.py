@@ -125,11 +125,11 @@ class NPL2PyStepByStepAgentChain:
             print(f"当前代码: {existing_code}")
             print("--------------------------------")
         
-        # 保存最终代码到 output_ab_dir
-        output_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
-        os.makedirs(self.output_ab_dir, exist_ok=True)
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(existing_code)
+        # # 保存最终代码到 output_ab_dir
+        # output_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
+        # os.makedirs(self.output_ab_dir, exist_ok=True)
+        # with open(output_path, "w", encoding="utf-8") as f:
+        #     f.write(existing_code)
 
         return demand_analysis_result, devide_steps_result, existing_code
 
