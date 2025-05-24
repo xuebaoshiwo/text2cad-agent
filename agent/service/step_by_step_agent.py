@@ -34,7 +34,7 @@ class NPL2PyStepByStepAgentChain:
          self.devide_steps_prompt_key = ["demand_analysis_npl", "geometry_supports"]
          # 生成代码层
          self.step_generate_code_prompt = step_generate_code_prompt
-         self.step_generate_code_prompt_key = ["demand_analysis_npl", "completed_steps", "existing_code", "step_to_generate_code", "support"]
+         self.step_generate_code_prompt_key = ["demand_analysis_npl", "completed_steps", "existing_code", "step_to_generate_code", "support", "output_ab_path"]
          # 执行层
          self.runner = FreeCADPythonRunner(freecad_python_path)
          # debug层
@@ -44,7 +44,10 @@ class NPL2PyStepByStepAgentChain:
          self.output_ab_dir = output_ab_dir
          self.max_retry_times = max_retry_times
 
-    async def run(self, npl: str):
+    async def run(self, npl: str, output_ab_dir: str = r"D:/Text2Cad/text2cad-agent/output"):
+        
+        id = str(uuid.uuid4())
+        
         # 分析层
         demand_analysis_result = await self.code_debug_chain.get_answer(
             self.demand_analysis_prompt, 
@@ -69,6 +72,8 @@ class NPL2PyStepByStepAgentChain:
         existing_code = ""
         last_correct_code = ""
         for step in steps:
+            file_name = id + "-step" + str(step.get("step_id")) + ".FCStd"
+            output_ab_path = os.path.join(output_ab_dir, file_name)
             use_supports = dict()
             support_name = step.get("support")
             if support_name:
@@ -83,7 +88,8 @@ class NPL2PyStepByStepAgentChain:
                 completed_steps=completed_steps, 
                 existing_code=existing_code, 
                 step_to_generate_code=step,
-                support = use_supports
+                support = use_supports,
+                output_ab_path = output_ab_path
             )
             code_str = parse_llm_py_code(code_str)
             
@@ -124,7 +130,7 @@ class NPL2PyStepByStepAgentChain:
 if __name__ == "__main__":
     npl2py_step_by_step_agent_chain = NPL2PyStepByStepAgentChain()
     npl = """
-   画一个马克杯
+   画一个平底锅
 """
     demand_analysis_result, devide_steps_result, existing_code = asyncio.run(npl2py_step_by_step_agent_chain.run(npl))
     print(demand_analysis_result)
