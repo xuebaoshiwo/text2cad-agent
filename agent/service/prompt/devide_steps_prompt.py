@@ -3,7 +3,7 @@ devide_steps_prompt = """
 
 要求:
 1.你的步骤划分必须严格参照分析师的分析描述和思路，不能遗漏任何重要步骤，也不能添加任何无关步骤。
-2.你的步骤只能是“绘制某个部分”，不可以是组装或是过于具体的操作。
+2.你的步骤不可以是过于具体的操作,只能是"绘制某部分"或"挖出某部分空腔"，不可以是其他形式的步骤。
 3.每一个步骤是否需要使用到geometry support list {geometry_supports}中的模型或者元素，如果需要请给这一个步骤加上support属性，值为geometry support的名字；若不在则不用添加。
 4.请将输出结构化为 JSON 格式，且你的输出只能是这个JSON，不能输出其他内容，JSON格式如下所示(你可以划分步骤数量不一定为3)：
 ```json
@@ -15,17 +15,22 @@ devide_steps_prompt = """
             "title": "绘制杯身",
             "goal": "创建高脚杯的主要容器部分",
             "support": geometry_support_name 1,
-        }}
+        }},
+        {{
+           "step_id": 2,
+           "title": "挖出杯身空腔",
+           "goal": "完成高脚杯杯身空腔挖除" ,
+        }},
         {{
             "step_id": 2,
             "title": "绘制杯脚",
             "goal": "创建高脚杯的支撑部分",
-        }}
+        }},
         {{
             "step_id": 3,
             "title": "绘制底座",
             "goal": "创建高脚杯的底座部分",
-        }}
+        }},
         ...
     ]
 }}
@@ -39,9 +44,7 @@ if __name__ == "__main__":
     import sys 
     import os
     import asyncio
-    # sys.path.append("d:\\Text2Cad\\text2cad-agent\\agent\\service")
     sys.path.append(os.path.join(os.getcwd(), "agent", "service"))
-
     print(sys.path)
     from qa_chain import QAChainService
     qa_chain = QAChainService()
