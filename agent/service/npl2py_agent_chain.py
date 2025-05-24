@@ -15,7 +15,11 @@ import uuid
 import os
 
 class NPL2PYAgentChain:
-    def __init__(self, output_ab_dir = r"D:/Text2Cad/text2cad-agent/output", freecad_python_path = r"D:/freecad/bin/python.exe", max_retry_times = 3):
+    def __init__(self, output_ab_dir=None, freecad_python_path = r"D:/freecad/bin/python.exe", max_retry_times = 3):
+         # 获取text2cad-agent根目录
+         root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+         if output_ab_dir is None:
+             output_ab_dir = os.path.join(root_dir, "output")
          self.qa_chain = QAChainService()
          self.code_debug_chain = QAChainService(type="claude")
 
@@ -73,6 +77,12 @@ class NPL2PYAgentChain:
                )
                code_str = parse_llm_py_code(code_str)
             retry_times += 1
+
+        # 保存最终代码到 output_ab_dir
+        output_code_path = os.path.join(self.output_ab_dir, f"{uuid.uuid4().hex}.py")
+        os.makedirs(self.output_ab_dir, exist_ok=True)
+        with open(output_code_path, "w", encoding="utf-8") as f:
+            f.write(code_str)
 
         return demand_analysis_result, generate_py_result, res
 

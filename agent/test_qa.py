@@ -1,5 +1,7 @@
 import sys
+import os
 sys.path.append(r"E:/Text2Cad/agent")
+sys.path.append(os.path.join(os.getcwd(), "agent"))
 
 import asyncio
 from langchain.chains import LLMChain
