@@ -146,7 +146,7 @@ class NPL2PyStepByStepAgentChain:
 if __name__ == "__main__":
     npl2py_step_by_step_agent_chain = NPL2PyStepByStepAgentChain()
     npl = """
-   画一个平底锅
+   画一只猫的头
 """
     demand_analysis_result, devide_steps_result, existing_code = asyncio.run(npl2py_step_by_step_agent_chain.run(npl))
     print(demand_analysis_result)
